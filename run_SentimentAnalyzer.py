@@ -13,8 +13,8 @@ def output_modify(text):
         output = '당황한'
     elif text == '상처':
         output = '상처받은'
-    elif text == '열등감':
-        output = '열등한'
+    # elif text == '열등감':
+    #     output = '열등한'
     elif text == '기쁨':
         output = '기뻐하는'
     elif text == '흥분':
