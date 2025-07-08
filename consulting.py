@@ -1,4 +1,3 @@
-
 import torch
 from transformers import pipeline, PreTrainedTokenizerFast, BartForConditionalGeneration, TextClassificationPipeline, BertForSequenceClassification, AutoTokenizer
 from sentence_transformers import SentenceTransformer
@@ -35,7 +34,7 @@ class SimilarityCalculator:
                 top_sentences.append((sen, avg_similarity))
                 top_similarities.append(avg_similarity)
             else:
-                min_index = top_similarities.index(min(top_similarities))
+                min_index = top_similarities.index(min(top_similarities)) 
                 if avg_similarity > top_similarities[min_index]:
                     top_sentences[min_index] = (sen, avg_similarity)
                     top_similarities[min_index] = avg_similarity
