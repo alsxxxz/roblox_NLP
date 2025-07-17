@@ -1,3 +1,43 @@
+import os
+import warnings
+
+# 1) requests 경고 무시
+from requests.exceptions import RequestsDependencyWarning
+warnings.simplefilter('ignore', RequestsDependencyWarning)
+
+# 2) return_all_scores 관련 UserWarning 무시
+warnings.filterwarnings(
+    'ignore',
+    '.*return_all_scores.*deprecated.*',
+    category=UserWarning
+)
+
+# ── 1) TensorFlow oneDNN 메시지/INFO 로그 끄기 ──────────────────────────
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'        # 0 = all, 1 = INFO, 2 = WARNING, 3 = ERROR
+os.environ['TF_ENABLE_ONEDNN_OPTS']  = '0'      # oneDNN custom ops 비활성화
+
+# ── 2) RequestsDependencyWarning 끄기 ────────────────────────────────
+from requests.exceptions import RequestsDependencyWarning
+warnings.filterwarnings('ignore', category=RequestsDependencyWarning)
+
+# ── 3) TensorFlow deprecation warning 끄기 ───────────────────────────
+warnings.filterwarnings('ignore',
+    message='.*tf\\.losses\\.sparse_softmax_cross_entropy.*',
+    category=DeprecationWarning)
+
+# ── 4) Transformers UserWarning (return_all_scores) 끄기 ───────────────
+warnings.filterwarnings('ignore',
+    message='.*return_all_scores is now deprecated.*',
+    category=UserWarning)
+
+# ── 5) Transformers 내부 로거 레벨을 ERROR로 높이기 ────────────────────
+from transformers import logging as transformers_logging
+transformers_logging.set_verbosity_error()
+
+# ── 6) TensorFlow 파이썬 로거 레벨을 ERROR로 높이기 ───────────────────
+import tensorflow as tf
+tf.get_logger().setLevel('ERROR')
+
 from consulting import SentimentAnalyzer
 import sys
 import argparse
@@ -10,10 +50,10 @@ def output_modify(text):
 # 더 자연스럽고 공감적인 표현 패턴
 def get_first_response_pattern():
     patterns = [
-        "사용자님께서는 현재 {} 감정이 드시는군요.",
-        "사용자님께서는 현재 {} 기분이 드시는군요.",
-        "사용자님께서는 현재 {} 마음이 드실 것 같아요.",
-        "사용자님께서는 지금 {} 상태이시군요."       
+        "참여자님께서는 현재 {} 감정이 드시는군요.",
+        "참여자님께서는 현재 {} 기분이 드시는군요.",
+        "참여자님께서는 현재 {} 마음이 드실 것 같아요.",
+        "참여자님께서는 지금 {} 상태이시군요."       
     ]
     return random.choice(patterns)
 
@@ -36,6 +76,12 @@ def get_combined_response_pattern():
         "더불어 {}, {} 마음도 있으시겠어요."
     ]
     return random.choice(patterns)
+
+def get_no_sentiment_patterns():
+    return [
+        "그러셨군요. 서로의 이야기를 더 들어볼까요?",
+        "참여자님의 이야기를 들려주셔서 감사합니다. 서로 더 대화를 나누어볼까요?"
+    ]
 
 sys.stdout.reconfigure(encoding='utf-8')
 parser = argparse.ArgumentParser()
@@ -75,6 +121,8 @@ elif len(filtered_sentiments) == 1:
     first_pattern = get_first_response_pattern()
     first_output = first_pattern.format(output_modify(filtered_sentiments[0]['label']))
     print(first_output)
+
+    #임계값 (현재 0.08) 넘는 감정이 없을 경우
 else:
-    # 0.5 이상인 감정이 없는 경우
-    print("그러셨군요. 사용자님의 이야기를 더 듣고싶어요.")
+    patterns = get_no_sentiment_patterns()
+    print(random.choice(patterns))

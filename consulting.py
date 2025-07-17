@@ -116,7 +116,7 @@ class SentimentAnalyzer:
         #    [{'label':'분노','score':0.42}, ... ]
 
         #2. 0.5 이상인 소분류만 필터링
-        filtered_raw = [r for r in raw if r['score'] >= 0.09]
+        filtered_raw = [r for r in raw if r['score'] >= 0.1]
         
         if not filtered_raw:
             return []
@@ -155,7 +155,7 @@ class SentimentAnalyzer:
             print(f"{i}. 소분류: {small_label} → 대분류: {big_label} | 점수: {score:.4f}")
         
         print("\n=== 0.06 이상인 소분류 감정들 ===")
-        filtered_raw = [r for r in raw if r['score'] >= 0.09]
+        filtered_raw = [r for r in raw if r['score'] >= 0.1]
         if filtered_raw:
             for result in filtered_raw:
                 small_label = result['label']
@@ -163,6 +163,6 @@ class SentimentAnalyzer:
                 big_label = small2big.get(small_label, "기타")
                 print(f"소분류: {small_label} → 대분류: {big_label} | 점수: {score:.4f}")
         else:
-            print("0.09 이상인 소분류 감정이 없습니다.")
+            print("0.1 이상인 소분류 감정이 없습니다.")
         
         return top3_small
